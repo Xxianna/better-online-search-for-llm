@@ -13,7 +13,7 @@ better-online-search-for-llm, 大语言模型更好的在线搜索openai api中�
 | anythingllm | ❌ net error|
 | chatbox | ❌ net error|
 | page assist | ❌ 调用成功但超时|
-
+| python openai | ✅ |
 
 
 
