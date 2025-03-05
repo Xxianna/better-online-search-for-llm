@@ -227,98 +227,98 @@ async def simple_chat_endpoint(request: TextRequest):
     # except Exception as e:
     #     raise HTTPException(status_code=500, detail=str(e))
 
-#做一个通用的接口以查看发来的包，允许接收任意请求而非OpenAIChatCompletionRequest
-@app.post("/v1/chat/completions")
-async def openai_chat_completion(request: Request):
-    print(request)
-    return {
-        "id": "chatcmpl-12345",
-        "object": "chat.completion",
-        "created": int(time.time()),
-        # "model": request.model,
-        "choices": [
-            {
-                "index": 0,
-                "message": {
-                    "role": "assistant",
-                    "content": f"测试消息"
-                },
-                "finish_reason": "stop",
-            }
-        ],
-        "usage": {
-            "prompt_tokens": 0,  # 未实现 token 计数
-            "completion_tokens": 0,
-            "total_tokens": 0,
-        },
-    }    
-
-
+# #做一个通用的接口以查看发来的包，允许接收任意请求而非OpenAIChatCompletionRequest
 # @app.post("/v1/chat/completions")
-# async def openai_chat_completion(request: OpenAIChatCompletionRequest):
-#     try:       
-#         # 生成搜索关键词
-#         keywords = generate_search_keywords(request.messages)
+# async def openai_chat_completion(request: Request):
+#     print(request)
+#     return {
+#         "id": "chatcmpl-12345",
+#         "object": "chat.completion",
+#         "created": int(time.time()),
+#         # "model": request.model,
+#         "choices": [
+#             {
+#                 "index": 0,
+#                 "message": {
+#                     "role": "assistant",
+#                     "content": f"测试消息"
+#                 },
+#                 "finish_reason": "stop",
+#             }
+#         ],
+#         "usage": {
+#             "prompt_tokens": 0,  # 未实现 token 计数
+#             "completion_tokens": 0,
+#             "total_tokens": 0,
+#         },
+#     }    
+
+
+@app.post("/v1/chat/completions")
+async def openai_chat_completion(request: OpenAIChatCompletionRequest):
+    try:       
+        # 生成搜索关键词
+        keywords = generate_search_keywords(request.messages)
         
-#         # 构造知识库提示词
-#         myurl = []
+        # 构造知识库提示词
+        myurl = []
 
-#         knowledge_prompt = construct_knowledge_prompt(keywords, myurl)
+        knowledge_prompt = construct_knowledge_prompt(keywords, myurl)
 
-#         r1prompt = get_r1_prompt()
+        r1prompt = get_r1_prompt()
 
-#         final_prompt = f"{knowledge_prompt} {r1prompt}"
+        final_prompt = f"{knowledge_prompt} {r1prompt}"
         
-#         # # 将知识库提示词添加到用户输入中
-#         request.messages.append({"role": "user", "content": final_prompt})
+        # # 将知识库提示词添加到用户输入中
+        request.messages.append({"role": "user", "content": final_prompt})
         
-#         # 调用 OpenAI 模型生成最终输出
-#         completion = client.chat.completions.create(
-#             model=request.model,
-#             messages=request.messages,
-#             n=request.n,
-#             stop=request.stop
-#             # stream=request.stream
-#         )
+        # 调用 OpenAI 模型生成最终输出
+        completion = client.chat.completions.create(
+            model=request.model,
+            messages=request.messages,
+            n=request.n,
+            stop=request.stop
+            # stream=request.stream
+        )
         
-#         # 返回 OpenAI 兼容的响应
+        # 返回 OpenAI 兼容的响应
 
-#         debuginfo0 = "\n".join([f"{i+1}. {keyword}" for i, keyword in enumerate(keywords)])
+        debuginfo0 = "\n".join([f"{i+1}. {keyword}" for i, keyword in enumerate(keywords)])
 
-#         try:
-#             updated_text = replace_citations(completion.choices[0].message.content, myurl)
-#         except Exception as e:
-#             updated_text = completion.choices[0].message.content
+        try:
+            updated_text = replace_citations(completion.choices[0].message.content, myurl)
+        except Exception as e:
+            updated_text = completion.choices[0].message.content
         
 
-#         # print(f"生成搜索词：\n{debuginfo0}\n最终提示词：{final_prompt}\n")
-#         print(updated_text)
+        # print(f"生成搜索词：\n{debuginfo0}\n最终提示词：{final_prompt}\n")
+        print(updated_text)
 
-#         return {
-#             "id": "chatcmpl-12345",
-#             "object": "chat.completion",
-#             "created": int(time.time()),
-#             # "model": request.model,
-#             "choices": [
-#                 {
-#                     "index": 0,
-#                     "message": {
-#                         "role": "assistant",
-#                         # "content": completion.choices[0].message.content,
-#                         # "content": f"用户搜索目的：{search_purpose}\n生成搜索词：\n{debuginfo0}\n最终提示词：{final_prompt}"
-#                         "content": f"生成搜索词：\n{debuginfo0}\n\n输出：{updated_text}"
-#                     },
-#                     "finish_reason": "stop",
-#                 }
-#             ],
-#             "usage": {
-#                 "prompt_tokens": 0,  # 未实现 token 计数
-#                 "completion_tokens": 0,
-#                 "total_tokens": 0,
-#             },
-#         }
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
+        return {
+            "id": "chatcmpl-12345",
+            "object": "chat.completion",
+            "created": int(time.time()),
+            # "model": request.model,
+            "choices": [
+                {
+                    "index": 0,
+                    "message": {
+                        "role": "assistant",
+                        # "content": completion.choices[0].message.content,
+                        # "content": f"用户搜索目的：{search_purpose}\n生成搜索词：\n{debuginfo0}\n最终提示词：{final_prompt}"
+                        "content": f"生成搜索词：\n{debuginfo0}\n\n输出：{updated_text}"
+                    },
+                    "finish_reason": "stop",
+                }
+            ],
+            "usage": {
+                "prompt_tokens": 0,  # 未实现 token 计数
+                "completion_tokens": 0,
+                "total_tokens": 0,
+            },
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/v1/models")
 async def openai_models():
